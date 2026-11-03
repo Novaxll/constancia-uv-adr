@@ -1,7 +1,7 @@
 # Procesamiento asíncrono mediante eventos persistidos para notificaciones de constancias
 
 * status: proposed
-* date: 2026-11-02
+* date: 2026-11-03
 
 ## Context and Problem Statement
 
@@ -60,4 +60,11 @@ Después de almacenar una constancia, la aplicación registra atómicamente un r
 
 ## More Information
 
-Decisión técnica formulada para la entrega de la práctica institucional ConstanciaUV.
+### Revisión 1. Cambio en el proveedor de notificaciones
+
+* **Cambio recibido:** El proveedor externo modificó su interfaz de comunicación (API) y la estructura del contrato para reportar errores de envío (cambios en el cuerpo de las respuestas JSON y nuevos códigos de estado HTTP).
+* **Impacto sobre la alternativa seleccionada:** El impacto se encuentra estrictamente acotado al adaptador de salida del worker de notificaciones. La emisión de constancias, su almacenamiento y el esquema de base de datos no experimentan alteración alguna.
+* **Vigencia de la decisión:** La decisión se mantiene en estado `proposed` adoptando la Alternativa B. El incidente valida la robustez del desacoplamiento, ya que la modificación no afecta el flujo crítico del estudiante.
+* **Consecuencias y comprobaciones actualizadas:**
+  * Se identifica el riesgo de reintentos infinitos si un error permanente no se reconoce adecuadamente. Se incorpora una política de reintentos con descarte (*Dead Letter Queue* o estado de notificación `FALLIDO_PERMANENTE`) tras alcanzar un límite preestablecido de intentos.
+  * Se incorporan pruebas de contrato (*Contract Tests*) y pruebas unitarias de mapeo de errores para validar exhaustivamente el nuevo esquema de respuestas devuelto por el proveedor de correo.
